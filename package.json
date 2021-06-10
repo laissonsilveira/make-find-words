@@ -1,0 +1,18 @@
+{
+  "name": "make-find-word",
+  "version": "1.0.0",
+  "description": "Find words by rules",
+  "main": "words",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github"
+  },
+  "author": "laisson.r.silveira@gmail.com",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "args": "^5.0.1"
+  }
+}

@@ -1,0 +1,65 @@
+#!/usr/bin/env node
+const rules = require('./rules');
+const args = require('args');
+args
+    .option('number', 'Number letters')
+    .option('letters', 'Possible letters')
+    .option('start', 'Start with')
+    .option('end', 'End with')
+    .option('norules', 'Without rules')
+    .option('amount', 'Min amount of letters informed should contains')
+    .option('make', 'Make words only')
+    .option('find', 'Make and find words');
+
+const flags = args.parse(process.argv);
+let { number, letters, norules, start, end, amount, make, find } = flags;
+if (!make && !find) return console.error('-m/--make or -f/--find is required!')
+if (make && find) return console.error('-m/--make or -f/--find only!')
+
+if (!number) return console.error('-n or --numbers is required!');
+if (!letters) return console.error('-l or --letters is required!');
+
+if (amount && Number(amount) > Number(number)) return console.error('-a should be minor that -n!')
+
+const words = require(`./dic/${number}.json`);
+letters = letters.split('');
+
+const makeWords = (n, letters) => {
+    letters = letters.map(l => l.toLowerCase());
+    const results = [];
+    const make = function (cache) {
+        for (var i = 0; i < letters.length; i++) {
+            cache += letters[i];
+            if (cache.length === n) results.push(cache);
+            else make(cache);
+            cache = cache.slice(0, -1);
+        }
+    }
+    make('');
+    return results;
+};
+
+let combination = makeWords(number, letters);
+
+if (make) {
+    console.log(`Created '${combination.length}' word(s): `, combination.join(', '));
+    return;
+}
+
+const findWords = combination => {
+    for (const rule of rules) {
+        combination = combination.filter(rule(letters, start, end, amount));
+    }
+    return combination;
+};
+
+if (!norules)
+    combination = findWords(combination);
+const found = [];
+if (combination.length)
+    for (const word of words) {
+        if (combination.includes(word.toLowerCase()))
+            found.push(word);
+    }
+
+console.log(`Found '${found.length}' word(s): `, found.join(', ') || 'Not found!')
